@@ -14,12 +14,10 @@ const CONFIG = {
    2. DISPLAY PERSONAL INFORMATION
 ===================================== */
 
-document.querySelectorAll("[data-name]").forEach((element) => {
-    element.textContent = CONFIG.name;
-});
-
-document.getElementById("pinClue").textContent = CONFIG.pinClue;
-document.getElementById("loveLetter").textContent = CONFIG.loveLetter;
+const pinClueElement = document.getElementById("pinClue");
+if (pinClueElement) {
+    pinClueElement.textContent = CONFIG.pinClue;
+}
 
 /* =====================================
    3. PAGE NAVIGATION
@@ -113,9 +111,8 @@ blingSound.playsInline = true;
 let audioUnlocked = false;
 
 function playSound(sound, label) {
-    const instance = sound.cloneNode();
-    instance.volume = sound.volume;
-    instance.play().catch((error) => {
+    sound.currentTime = 0;
+    sound.play().catch((error) => {
         console.log(`${label} sound could not play:`, error);
     });
 }
@@ -123,23 +120,28 @@ function playSound(sound, label) {
 function unlockAudio() {
     if (audioUnlocked) return;
 
-    [buttonSound, blingSound].forEach((sound) => {
-        sound.muted = true;
+    const sounds = [buttonSound, blingSound, backgroundMusic];
+
+    sounds.forEach((sound) => {
+        const originalVolume = sound.volume;
+        sound.volume = 0.001;
         sound.currentTime = 0;
         sound.play().then(() => {
             sound.pause();
             sound.currentTime = 0;
-            sound.muted = false;
-            audioUnlocked = true;
+            sound.volume = originalVolume;
         }).catch((error) => {
-            sound.muted = false;
+            sound.volume = originalVolume;
             console.warn("Audio could not be unlocked:", error);
         });
     });
+
+    audioUnlocked = true;
 }
 
 document.addEventListener("pointerdown", unlockAudio, { once: true });
 document.addEventListener("touchstart", unlockAudio, { once: true });
+document.addEventListener("click", unlockAudio, { once: true });
 
 document.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
