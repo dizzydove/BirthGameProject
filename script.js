@@ -5,7 +5,7 @@
 
 const CONFIG = {
     name: "My Love",
-    pin: "120626",
+    pin: "130626",
     pinClue: "Our first meet",
     loveLetter: `Happy birthday, sayang! Thank you for being part of my life and making so many ordinary moments feel special. I hope this new chapter brings you peace, good health, exciting opportunities, and every little thing you have been wishing for. Please remember that you are loved, appreciated, and never have to figure everything out alone. I’m proud of you, and I’ll keep cheering for you. Here’s to more memories, more laughter, and many more birthdays together. I love you, always. ♡`
 };
