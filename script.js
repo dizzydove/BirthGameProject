@@ -93,70 +93,45 @@ if (giftButton && giftScreen) {
     });
 }
 
+
 /* =====================================
    5. BUTTON SOUND EFFECT
 ===================================== */
 
 const buttonSound = new Audio("./assets/sounds/click.mp3");
-
 buttonSound.preload = "auto";
 buttonSound.volume = 0.7;
-buttonSound.playsInline = true;
-buttonSound.setAttribute("playsinline", "");
-buttonSound.setAttribute("webkit-playsinline", "");
-buttonSound.load();
 
 const blingSound = new Audio("./assets/sounds/Bling.mp3");
 blingSound.preload = "auto";
 blingSound.volume = 0.8;
-blingSound.playsInline = true;
-blingSound.setAttribute("playsinline", "");
-blingSound.setAttribute("webkit-playsinline", "");
-blingSound.load();
 
-let audioUnlocked = false;
-
+// Mainkan suara dan tangani jika gagal
 function playSound(sound, label) {
-    sound.currentTime = 0;
-    sound.play().catch((error) => {
-        console.log(`${label} sound could not play:`, error);
-    });
-}
-
-function unlockAudio() {
-    if (audioUnlocked) return;
-
-    const sounds = [buttonSound, blingSound];
-
-    sounds.forEach((sound) => {
-        const originalVolume = sound.volume;
-        sound.volume = 0.001;
+    try {
+        sound.pause();
         sound.currentTime = 0;
-        sound.play().then(() => {
-            sound.pause();
-            sound.currentTime = 0;
-            sound.volume = originalVolume;
-        }).catch((error) => {
-            sound.volume = originalVolume;
-            console.warn("Audio could not be unlocked:", error);
-        });
-    });
 
-    audioUnlocked = true;
+        const playback = sound.play();
+
+        if (playback) {
+            playback.catch((error) => {
+                console.warn(`${label} sound failed:`, error);
+            });
+        }
+    } catch (error) {
+        console.warn(`${label} sound failed:`, error);
+    }
 }
 
-document.addEventListener("pointerdown", unlockAudio, { once: true });
-document.addEventListener("touchstart", unlockAudio, { once: true });
-document.addEventListener("click", unlockAudio, { once: true });
-
+// Suara klik untuk tombol.
+// Gunakan pointerdown agar pemutaran dimulai langsung dari sentuhan pengguna.
 document.querySelectorAll("button").forEach((button) => {
-    button.addEventListener("click", () => {
-        if (!audioUnlocked) {
-            unlockAudio();
-        }
-        playSound(buttonSound, "Button");
+    button.addEventListener("pointerdown", () => {
+        playSound(buttonSound, "Click");
     });
 });
+
 
 /* =====================================
    6. BACKGROUND MUSIC
