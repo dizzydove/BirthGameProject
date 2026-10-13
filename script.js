@@ -102,15 +102,26 @@ const buttonSound = new Audio("./assets/sounds/click.mp3");
 
 buttonSound.preload = "auto";
 buttonSound.volume = 0.7;
+buttonSound.playsInline = true;
+buttonSound.setAttribute("playsinline", "");
+buttonSound.setAttribute("webkit-playsinline", "");
+buttonSound.load();
 
 const blingSound = new Audio("./assets/sounds/Bling.mp3");
+
 blingSound.preload = "auto";
 blingSound.volume = 0.8;
+blingSound.playsInline = true;
+blingSound.setAttribute("playsinline", "");
+blingSound.setAttribute("webkit-playsinline", "");
+blingSound.load();
 
 let audioUnlocked = false;
 
+// Mainkan suara dan tangani jika gagal
 function playSound(sound, label) {
     sound.currentTime = 0;
+
     sound.play().catch((error) => {
         console.log(`${label} sound could not play:`, error);
     });
@@ -119,27 +130,40 @@ function playSound(sound, label) {
 function unlockAudio() {
     if (audioUnlocked) return;
 
-    [buttonSound, blingSound].forEach((sound) => {
-        const originalVolume = sound.volume;
-        sound.volume = 0.001;
+    const sounds = [buttonSound, blingSound];
 
-        sound.play().then(() => {
-            sound.pause();
-            sound.currentTime = 0;
-            sound.volume = originalVolume;
-        }).catch((error) => {
-            sound.volume = originalVolume;
-            console.warn("Audio could not be unlocked:", error);
-        });
+    sounds.forEach((sound) => {
+        const originalVolume = sound.volume;
+
+        sound.volume = 0.001;
+        sound.currentTime = 0;
+
+        sound.play()
+            .then(() => {
+                sound.pause();
+                sound.currentTime = 0;
+                sound.volume = originalVolume;
+            })
+            .catch((error) => {
+                sound.volume = originalVolume;
+                console.warn("Audio could not be unlocked:", error);
+            });
     });
 
     audioUnlocked = true;
 }
 
 document.addEventListener("pointerdown", unlockAudio, { once: true });
+document.addEventListener("touchstart", unlockAudio, { once: true });
+document.addEventListener("click", unlockAudio, { once: true });
 
+// Suara klik untuk tombol
 document.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
+        if (!audioUnlocked) {
+            unlockAudio();
+        }
+
         playSound(buttonSound, "Button");
     });
 });
