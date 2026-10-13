@@ -99,18 +99,51 @@ if (giftButton && giftScreen) {
    5. BUTTON SOUND EFFECT
 ===================================== */
 
-const buttonSound = new Audio("assets/sounds/click.mp3");
+const buttonSound = new Audio("./assets/sounds/click.mp3");
 
 buttonSound.preload = "auto";
 buttonSound.volume = 0.7;
+buttonSound.playsInline = true;
+
+const blingSound = new Audio("./assets/sounds/Bling.mp3");
+blingSound.preload = "auto";
+blingSound.volume = 0.8;
+blingSound.playsInline = true;
+
+let audioUnlocked = false;
+
+function playSound(sound, label) {
+    const instance = sound.cloneNode();
+    instance.volume = sound.volume;
+    instance.play().catch((error) => {
+        console.log(`${label} sound could not play:`, error);
+    });
+}
+
+function unlockAudio() {
+    if (audioUnlocked) return;
+
+    [buttonSound, blingSound].forEach((sound) => {
+        sound.muted = true;
+        sound.currentTime = 0;
+        sound.play().then(() => {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.muted = false;
+            audioUnlocked = true;
+        }).catch((error) => {
+            sound.muted = false;
+            console.warn("Audio could not be unlocked:", error);
+        });
+    });
+}
+
+document.addEventListener("pointerdown", unlockAudio, { once: true });
+document.addEventListener("touchstart", unlockAudio, { once: true });
 
 document.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
-        buttonSound.currentTime = 0;
-
-        buttonSound.play().catch((error) => {
-            console.log("Button sound could not play:", error);
-        });
+        playSound(buttonSound, "Button");
     });
 });
 
@@ -123,6 +156,7 @@ const backgroundMusic = new Audio("./assets/sounds/HeyLover.mp3");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.35;
 backgroundMusic.preload = "auto";
+backgroundMusic.playsInline = true;
 
 const musicBtn = document.getElementById("musicBtn");
 const musicNote = document.getElementById("musicNote");
@@ -184,26 +218,6 @@ const catchField = document.getElementById("catchField");
 const basket = document.getElementById("basket");
 const catchCount = document.getElementById("catchCount");
 
-const blingSound = new Audio("assets/sounds/Bling.mp3");
-blingSound.preload = "auto";
-blingSound.volume = 0.8;
-let blingSoundUnlocked = false;
-
-function unlockBlingSound() {
-    if (blingSoundUnlocked) return;
-
-    blingSound.muted = true;
-    blingSound.play().then(() => {
-        blingSound.pause();
-        blingSound.currentTime = 0;
-        blingSound.muted = false;
-        blingSoundUnlocked = true;
-    }).catch((error) => {
-        blingSound.muted = false;
-        console.warn("Bling sound could not be unlocked:", error);
-    });
-}
-
 // Update score
 function updateCatches() {
     catchCount.textContent = `Photos: ${catches} / 10 · Lives: ${lives} ♡`;
@@ -224,10 +238,7 @@ function showCatchMessage(message, x, y) {
 
 // Play sound when catching a photo
 function playBling() {
-    blingSound.currentTime = 0;
-    blingSound.play().catch((error) => {
-        console.log("Bling sound could not play:", error);
-    });
+    playSound(blingSound, "Bling");
 }
 
 // Move basket horizontally
@@ -451,8 +462,6 @@ function startCatch() {
 
 // Start the game when entering the Catch Me screen
 document.querySelector('[data-go="catch"]').addEventListener("click", () => {
-    unlockBlingSound();
-
     setTimeout(() => {
         if (document.getElementById("catch").classList.contains("active")) {
             startCatch();
