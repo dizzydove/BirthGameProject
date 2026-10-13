@@ -102,11 +102,17 @@ const buttonSound = new Audio("./assets/sounds/click.mp3");
 buttonSound.preload = "auto";
 buttonSound.volume = 0.7;
 buttonSound.playsInline = true;
+buttonSound.setAttribute("playsinline", "");
+buttonSound.setAttribute("webkit-playsinline", "");
+buttonSound.load();
 
 const blingSound = new Audio("./assets/sounds/Bling.mp3");
 blingSound.preload = "auto";
 blingSound.volume = 0.8;
 blingSound.playsInline = true;
+blingSound.setAttribute("playsinline", "");
+blingSound.setAttribute("webkit-playsinline", "");
+blingSound.load();
 
 let audioUnlocked = false;
 
@@ -120,7 +126,7 @@ function playSound(sound, label) {
 function unlockAudio() {
     if (audioUnlocked) return;
 
-    const sounds = [buttonSound, blingSound, backgroundMusic];
+    const sounds = [buttonSound, blingSound];
 
     sounds.forEach((sound) => {
         const originalVolume = sound.volume;
@@ -145,6 +151,9 @@ document.addEventListener("click", unlockAudio, { once: true });
 
 document.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
+        if (!audioUnlocked) {
+            unlockAudio();
+        }
         playSound(buttonSound, "Button");
     });
 });

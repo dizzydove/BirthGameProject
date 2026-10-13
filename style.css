@@ -1125,6 +1125,7 @@ body {
 
 #wordsearch .game-instruction {
     margin: 12px auto 16px;
+    font-size: 13px;
 }
 
 #catch .catch-field {
