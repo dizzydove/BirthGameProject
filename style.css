@@ -799,11 +799,12 @@ h2 {
     font-size: 2rem;
 }
 
-.letter-sheet > p:not(.kicker):not(.signature) {
+.letter-body {
     color: #536b85;
     font-size: 0.88rem;
-    line-height: 2.05;
-    white-space: pre-line;
+    line-height: 1.8;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
 .signature {
@@ -1117,6 +1118,7 @@ body {
 
 #catch .game-instruction {
     margin: 12px auto 18px;
+    font-size: 13px;
 }
 
 #catch .game-top .kicker {
