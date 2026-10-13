@@ -94,44 +94,55 @@ if (giftButton && giftScreen) {
 }
 
 
-
 /* =====================================
    5. BUTTON SOUND EFFECT
 ===================================== */
 
 const buttonSound = new Audio("./assets/sounds/click.mp3");
+
 buttonSound.preload = "auto";
 buttonSound.volume = 0.7;
 
-const blingSound = new Audio("./assets/sounds/bling.mp3");
+const blingSound = new Audio("./assets/sounds/Bling.mp3");
 blingSound.preload = "auto";
 blingSound.volume = 0.8;
 
+let audioUnlocked = false;
+
 function playSound(sound, label) {
-    const audio = sound.cloneNode();
-
-    audio.volume = sound.volume;
-    audio.currentTime = 0;
-
-    audio.play().catch((error) => {
-        console.warn(label + " sound failed:", error);
+    sound.currentTime = 0;
+    sound.play().catch((error) => {
+        console.log(`${label} sound could not play:`, error);
     });
 }
 
-// Suara klik ketika tombol disentuh
-document.addEventListener("pointerdown", (event) => {
-    const button = event.target.closest("button");
+function unlockAudio() {
+    if (audioUnlocked) return;
 
-    if (!button) return;
+    [buttonSound, blingSound].forEach((sound) => {
+        const originalVolume = sound.volume;
+        sound.volume = 0.001;
 
-    playSound(buttonSound, "Click");
-});
+        sound.play().then(() => {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.volume = originalVolume;
+        }).catch((error) => {
+            sound.volume = originalVolume;
+            console.warn("Audio could not be unlocked:", error);
+        });
+    });
 
-// Fungsi untuk memainkan suara Bling
-function playBling() {
-    playSound(blingSound, "Bling");
+    audioUnlocked = true;
 }
 
+document.addEventListener("pointerdown", unlockAudio, { once: true });
+
+document.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+        playSound(buttonSound, "Button");
+    });
+});
 
 
 /* =====================================
