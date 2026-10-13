@@ -1,4 +1,4 @@
-
+.
 /* =====================================
    1. PERSONALIZATION
 ===================================== */
@@ -94,6 +94,7 @@ if (giftButton && giftScreen) {
 }
 
 
+
 /* =====================================
    5. BUTTON SOUND EFFECT
 ===================================== */
@@ -102,35 +103,35 @@ const buttonSound = new Audio("./assets/sounds/click.mp3");
 buttonSound.preload = "auto";
 buttonSound.volume = 0.7;
 
-const blingSound = new Audio("./assets/sounds/Bling.mp3");
+const blingSound = new Audio("./assets/sounds/bling.mp3");
 blingSound.preload = "auto";
 blingSound.volume = 0.8;
 
-// Mainkan suara dan tangani jika gagal
 function playSound(sound, label) {
-    try {
-        sound.pause();
-        sound.currentTime = 0;
+    const audio = sound.cloneNode();
 
-        const playback = sound.play();
+    audio.volume = sound.volume;
+    audio.currentTime = 0;
 
-        if (playback) {
-            playback.catch((error) => {
-                console.warn(`${label} sound failed:`, error);
-            });
-        }
-    } catch (error) {
-        console.warn(`${label} sound failed:`, error);
-    }
+    audio.play().catch((error) => {
+        console.warn(label + " sound failed:", error);
+    });
 }
 
-// Suara klik untuk tombol.
-// Gunakan pointerdown agar pemutaran dimulai langsung dari sentuhan pengguna.
-document.querySelectorAll("button").forEach((button) => {
-    button.addEventListener("pointerdown", () => {
-        playSound(buttonSound, "Click");
-    });
+// Suara klik ketika tombol disentuh
+document.addEventListener("pointerdown", (event) => {
+    const button = event.target.closest("button");
+
+    if (!button) return;
+
+    playSound(buttonSound, "Click");
 });
+
+// Fungsi untuk memainkan suara Bling
+function playBling() {
+    playSound(blingSound, "Bling");
+}
+
 
 
 /* =====================================
