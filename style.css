@@ -706,6 +706,27 @@ h2 {
     letter-spacing: 0.25em;
 }
 
+.pin-entry {
+    position: relative;
+    border-radius: 6px;
+}
+
+.pin-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    opacity: 0;
+    border: 0;
+    font-size: 16px;
+}
+
+.pin-entry:focus-within {
+    outline: 2px solid #82b3d0;
+    outline-offset: 4px;
+}
+
 .pin-send {
     margin-top: 4px;
 }

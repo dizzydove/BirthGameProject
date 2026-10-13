@@ -31,6 +31,10 @@ function go(id) {
         screen.classList.toggle("active", screen.id === id);
     });
 
+    if (id === "pin" && pinInput) {
+        pinInput.focus({ preventScroll: true });
+    }
+
     window.scrollTo({
         top: 0,
         behavior: "smooth"
@@ -180,9 +184,25 @@ const catchField = document.getElementById("catchField");
 const basket = document.getElementById("basket");
 const catchCount = document.getElementById("catchCount");
 
-const blingSound = new Audio("assets/sounds/bling.mp3");
+const blingSound = new Audio("assets/sounds/Bling.mp3");
 blingSound.preload = "auto";
 blingSound.volume = 0.8;
+let blingSoundUnlocked = false;
+
+function unlockBlingSound() {
+    if (blingSoundUnlocked) return;
+
+    blingSound.muted = true;
+    blingSound.play().then(() => {
+        blingSound.pause();
+        blingSound.currentTime = 0;
+        blingSound.muted = false;
+        blingSoundUnlocked = true;
+    }).catch((error) => {
+        blingSound.muted = false;
+        console.warn("Bling sound could not be unlocked:", error);
+    });
+}
 
 // Update score
 function updateCatches() {
@@ -431,6 +451,8 @@ function startCatch() {
 
 // Start the game when entering the Catch Me screen
 document.querySelector('[data-go="catch"]').addEventListener("click", () => {
+    unlockBlingSound();
+
     setTimeout(() => {
         if (document.getElementById("catch").classList.contains("active")) {
             startCatch();
@@ -894,8 +916,12 @@ const pinSend = document.getElementById("pinSend");
 const pinFeedback = document.getElementById("pinFeedback");
 const pinDots = document.getElementById("pinDots");
 const pinScreen = document.getElementById("pin");
+const pinInput = document.getElementById("pinInput");
 const pinMustBeNumeric = /^\d+$/.test(CONFIG.pin);
 let pinValue = "";
+
+pinInput.inputMode = pinMustBeNumeric ? "numeric" : "text";
+pinInput.maxLength = CONFIG.pin.length;
 
 function isPinScreenActive() {
     return pinScreen && pinScreen.classList.contains("active");
@@ -917,6 +943,7 @@ function submitPin() {
     if (pinValue === CONFIG.pin) {
         pinFeedback.textContent = "";
         pinValue = "";
+        pinInput.value = "";
         updatePinDots();
         go("letter");
         return;
@@ -924,6 +951,7 @@ function submitPin() {
 
     pinFeedback.textContent = "Not quite! Try again, sayang 💙";
     pinValue = "";
+    pinInput.value = "";
     updatePinDots();
 }
 
@@ -933,39 +961,22 @@ if (pinSend && pinDots) {
     pinSend.addEventListener("click", submitPin);
 }
 
-document.addEventListener("keydown", (event) => {
+pinInput.addEventListener("input", () => {
     if (!isPinScreenActive()) return;
 
+    pinValue = pinMustBeNumeric
+        ? pinInput.value.replace(/\D/g, "").slice(0, CONFIG.pin.length)
+        : pinInput.value.slice(0, CONFIG.pin.length);
+    pinInput.value = pinValue;
+    pinFeedback.textContent = "";
+    updatePinDots();
+});
+
+pinInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         event.preventDefault();
         submitPin();
-        return;
     }
-
-    if (event.key === "Backspace") {
-        event.preventDefault();
-        pinValue = pinValue.slice(0, -1);
-        pinFeedback.textContent = "";
-        updatePinDots();
-        return;
-    }
-
-    if (
-        event.key.length !== 1 ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.altKey
-    ) {
-        return;
-    }
-
-    if (pinValue.length >= CONFIG.pin.length) return;
-    if (pinMustBeNumeric && !/\d/.test(event.key)) return;
-
-    event.preventDefault();
-    pinValue += event.key;
-    pinFeedback.textContent = "";
-    updatePinDots();
 });
 
 /* =====================================

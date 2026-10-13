@@ -136,7 +136,17 @@
                 <h2 class="script-title">Enter PIN</h2>
                 <p class="kicker">Unlock your gift! 🔐</p>
                 <p class="hint">Clue: <span id="pinClue">Our first meet</span></p>
-                <div class="pin-dots" id="pinDots">♡ ♡ ♡ ♡ ♡ ♡</div>
+                <div class="pin-entry">
+                    <div class="pin-dots" id="pinDots" aria-hidden="true">♡ ♡ ♡ ♡ ♡ ♡</div>
+                    <input
+                        class="pin-input"
+                        id="pinInput"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        aria-label="Enter PIN"
+                    >
+                </div>
                 <button class="btn primary pin-send" id="pinSend" type="button">
                     Send Code 💌
                 </button>
