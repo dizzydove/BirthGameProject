@@ -1,4 +1,3 @@
-.
 /* =====================================
    1. PERSONALIZATION
 ===================================== */
@@ -129,28 +128,37 @@ function playSound(sound, label) {
 
 function unlockAudio() {
     if (audioUnlocked) return;
+    try {
+        const sounds = [buttonSound, blingSound];
 
-    const sounds = [buttonSound, blingSound];
+        sounds.forEach((sound) => {
+            try {
+                const originalVolume = sound.volume;
 
-    sounds.forEach((sound) => {
-        const originalVolume = sound.volume;
-
-        sound.volume = 0.001;
-        sound.currentTime = 0;
-
-        sound.play()
-            .then(() => {
-                sound.pause();
+                sound.volume = 0.001;
                 sound.currentTime = 0;
-                sound.volume = originalVolume;
-            })
-            .catch((error) => {
-                sound.volume = originalVolume;
-                console.warn("Audio could not be unlocked:", error);
-            });
-    });
 
-    audioUnlocked = true;
+                const p = sound.play();
+                if (p && typeof p.then === "function") {
+                    p.then(() => {
+                        sound.pause();
+                        sound.currentTime = 0;
+                        sound.volume = originalVolume;
+                    }).catch((error) => {
+                        sound.volume = originalVolume;
+                        console.warn("Audio could not be unlocked:", error);
+                    });
+                }
+            } catch (err) {
+                console.warn("unlockAudio inner error:", err);
+            }
+        });
+
+        audioUnlocked = true;
+    } catch (err) {
+        console.error("unlockAudio failed:", err);
+        audioUnlocked = false;
+    }
 }
 
 document.addEventListener("pointerdown", unlockAudio, { once: true });
@@ -160,11 +168,15 @@ document.addEventListener("click", unlockAudio, { once: true });
 // Suara klik untuk tombol
 document.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
-        if (!audioUnlocked) {
-            unlockAudio();
-        }
+        try {
+            if (!audioUnlocked) {
+                unlockAudio();
+            }
 
-        playSound(buttonSound, "Button");
+            playSound(buttonSound, "Button");
+        } catch (err) {
+            console.error("Button click handler error:", err);
+        }
     });
 });
 
