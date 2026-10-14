@@ -534,12 +534,12 @@ document.addEventListener("keydown", (event) => {
 const WORD_SEARCH_CONFIG = {
     minGridSize: 8,
     words: [
-        "KIND",
-        "SEXY",
         "ADORABLE",
-        "WITTY",
+        "SEXY",
         "SWEET",
-        "HANDSOME"
+        "HANDSOME",
+        "KIND",
+        "WITTY"     
     ]
 };
 
